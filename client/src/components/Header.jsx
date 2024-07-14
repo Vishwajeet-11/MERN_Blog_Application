@@ -34,7 +34,9 @@ function Header() {
           <FaMoon />
         </Button>
         <Link to="/sign-in">
-          <Button gradientDuoTone="purpleToBlue" outline>Sign In</Button>
+          <Button color="white" style={{ border: "1px solid black" }} outline>
+            Sign In
+          </Button>
         </Link>
         <Navbar.Toggle />
       </div>
