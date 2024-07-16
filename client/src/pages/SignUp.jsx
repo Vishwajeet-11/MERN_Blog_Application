@@ -1,9 +1,52 @@
 /* eslint-disable react/no-unescaped-entities */
-import { Button, Label, TextInput } from "flowbite-react";
-import React from "react";
-import { Link } from "react-router-dom";
+import { Alert, Button, Label, TextInput } from "flowbite-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
+  const [formData, setFormData] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.username || !formData.email || !formData.password) {
+      return setErrorMessage("All fields are mandatory!");
+    }
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMessage(data.message || 'Sign up failed');
+      } else {
+        setErrorMessage('');
+        // handle successful sign-up (e.g., redirect or display a success message)
+      }
+
+      if(res.ok){
+        navigate('/sign-in');
+      }
+
+    } catch (error) {
+      setErrorMessage(error.message || 'Sign up failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen mt-20">
@@ -24,26 +67,50 @@ function SignUp() {
             </p>
           </div>
           <div className="flex-1">
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <div>
-                <Label value="your username" />
-                <TextInput type="text" placeholder="Username" id="username" />
+                <Label value="Your username" />
+                <TextInput
+                  type="text"
+                  placeholder="Username"
+                  id="username"
+                  onChange={handleChange}
+                  disabled={loading}
+                />
               </div>
               <div>
-                <Label value="your email" />
-                <TextInput type="text" placeholder="yourname@mail.com" id="email" />
+                <Label value="Your email" />
+                <TextInput
+                  type="email"
+                  placeholder="yourname@mail.com"
+                  id="email"
+                  onChange={handleChange}
+                  disabled={loading}
+                />
               </div>
               <div>
-                <Label value="your password" />
-                <TextInput type="text" placeholder="Password" id="password" />
+                <Label value="Your password" />
+                <TextInput
+                  type="password"
+                  placeholder="Password"
+                  id="password"
+                  onChange={handleChange}
+                  disabled={loading}
+                />
               </div>
               <Button
                 style={{ background: "black", color: "white" }}
                 type="submit"
+                disabled={loading}
               >
-                SignUp
+                {loading ? 'Signing Up...' : 'Sign Up'}
               </Button>
             </form>
+            {errorMessage && (
+              <Alert className="mt-5" color="failure">
+                {errorMessage}
+              </Alert>
+            )}
           </div>
         </div>
       </div>
