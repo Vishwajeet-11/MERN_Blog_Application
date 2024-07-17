@@ -113,15 +113,16 @@ function SignUp() {
             )}
           </div>
         </div>
-      </div>
       <div className="">
         <span>Have an account?</span>
         <Link to="/sign-in" className="text-blue-500">
           Sign In
         </Link>
       </div>
+      </div>
     </>
   );
 }
 
 export default SignUp;
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>    Have an ac. div fix pending!           <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
