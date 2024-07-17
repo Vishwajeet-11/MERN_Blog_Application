@@ -73,11 +73,11 @@ export const login = async (req, res) => {
 
     res.status(200).cookie('access-token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' // Ensure cookies are sent only over HTTPS in production
+      secure: process.env.NODE_ENV === 'production' 
     }).json({
       success: true,
       message: "User logged in successfully",
-      user: user.username,
+      user: user,
     });
 
   } catch (error) {
