@@ -1,12 +1,18 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Alert, Button, Label, TextInput } from "flowbite-react";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess
+} from "../redux/user/userSlice";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const {loading, error: errorMessage} = useSelector(state => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,11 +22,11 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.password) {
-      return setErrorMessage("All fields are mandatory!");
+      dispatch(signInFailure("Username and password are required"));
+      return;
     }
-    setLoading(true);
-    setErrorMessage("");
     try {
+      dispatch(signInStart());
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,19 +36,13 @@ function SignIn() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMessage(data.message || "Sign up failed");
+        dispatch(signInFailure(data.message));
       } else {
-        setErrorMessage("");
-        // handle successful sign-up (e.g., redirect or display a success message)
-      }
-
-      if (res.ok) {
+        dispatch(signInSuccess(data));
         navigate("/");
       }
     } catch (error) {
-      setErrorMessage(error.message || "Sign up failed");
-    } finally {
-      setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -96,7 +96,7 @@ function SignIn() {
               </Button>
             </form>
             <div className="flex gap-2 text-sm mt-5">
-              <span>Don't Have an account?</span>
+              <span>Don't have an account?</span>
               <Link to="/sign-up" className="text-blue-500">
                 Sign Up
               </Link>
@@ -114,4 +114,3 @@ function SignIn() {
 }
 
 export default SignIn;
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>    Have an ac. div fix pending!           <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
